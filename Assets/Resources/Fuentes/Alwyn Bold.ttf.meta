@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: c6e65e8a1a8789343b8362cab2584dd9
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Alwyn
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 82c81df26c900f44aa3fc3d34d5565d9, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
