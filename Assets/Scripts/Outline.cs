@@ -136,11 +136,11 @@ public class Outline : MonoBehaviour {
     }
 
     // Clear UV3 on skinned mesh renderers
-    foreach (var skinnedMeshRenderer in GetComponentsInChildren<SkinnedMeshRenderer>()) {
-      if (registeredMeshes.Add(skinnedMeshRenderer.sharedMesh)) {
-        skinnedMeshRenderer.sharedMesh.uv4 = new Vector2[skinnedMeshRenderer.sharedMesh.vertexCount];
-      }
-    }
+    //foreach (var skinnedMeshRenderer in GetComponentsInChildren<SkinnedMeshRenderer>()) {
+    //  if (registeredMeshes.Add(skinnedMeshRenderer.sharedMesh)) {
+    //    skinnedMeshRenderer.sharedMesh.uv4 = new Vector2[skinnedMeshRenderer.sharedMesh.vertexCount];
+    //  }
+    //}
   }
 
   List<Vector3> SmoothNormals(Mesh mesh) {

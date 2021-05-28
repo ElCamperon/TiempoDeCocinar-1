@@ -13,26 +13,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SimpleSelectedItems:
-    m_Keys:
-    - .collabignore
-    - Assets/NewBehaviourScript.cs
-    - Assets/NewBehaviourScript.cs.meta
-    - ProjectSettings/AudioManager.asset
-    - ProjectSettings/ClusterInputManager.asset
-    - ProjectSettings/DynamicsManager.asset
-    - ProjectSettings/EditorBuildSettings.asset
-    - ProjectSettings/InputManager.asset
-    - ProjectSettings/NavMeshAreas.asset
-    - ProjectSettings/Physics2DSettings.asset
-    - ProjectSettings/PresetManager.asset
-    - ProjectSettings/ProjectSettings.asset
-    - ProjectSettings/ProjectVersion.txt
-    - ProjectSettings/TagManager.asset
-    - ProjectSettings/TimeManager.asset
-    - ProjectSettings/VFXManager.asset
-    - ProjectSettings/VersionControlSettings.asset
-    - 
-    m_Values: 000000000000000000000000000000000000
+    m_Keys: []
+    m_Values: 
   RevisionSummary: 
   ChangesSearchValue: 
   SelectedHistoryRevision: 

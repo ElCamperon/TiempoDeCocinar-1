@@ -9,7 +9,9 @@ public class ChefController : MonoBehaviour
     private readonly string[] advertenciasIncompleto = new string[3] { "No te apresures, aun te falta algun paso ", "Estaria bien cocinar primero...", "Me gusta tu motivación pero tomalo con calma" };
     private readonly string[] advertenciasPicar = new string[2] { "Picala primero con un cuchillo", "Asi no es como se deberia hacerce" };
 
-    private readonly string[] dialogoInicial = new string[3] { "Bienbenido, necesito tu ayuda ","2","3" };
+    private readonly string[] dialogoInicial = new string[2] {
+        "Bienvenido, he buscado un aprendiz por mucho tiempo y te he encontrado a ti, asegúrate de escuchar mis consejos para avanzar hasta convertirte en un/a gran Chef.",
+        "Empezaremos por preparar un plato tradicional de la región de Santander--Colombia, no te preocupes, te guiare paso a paso hasta completarlo, buena suerte mi estudiante." };
 
     void Awake()
     {
@@ -18,30 +20,44 @@ public class ChefController : MonoBehaviour
         else uIController = FindObjectOfType<UIController>();
 
         Eventos.Mensaje += Mensaje;
-        Dialogo();
 
+        StartCoroutine(nameof(DialogoInicial));
+        //Eventos.Comienzo += Dialogo;
+        //Eventos.Comienzo(true);
     }
-    private void Dialogo()
-    {
-        StartCoroutine(DialogoInicial());
-    }
+    //public void Siguiente()
+    //{
+    //    StopCoroutine(nameof(dialogoInicial));
+    //    uIController.LimpiarInfoDialogo();
+    //    uIController.indicaciones.gameObject.SetActive(true);
+    //}
+    //private void Dialogo(bool c=true)
+    //{
+    //    StartCoroutine(DialogoInicial());
+    //}
     IEnumerator DialogoInicial()
     {
         bool finalizar=false;
 
-        for(int d = 0; d < dialogoInicial.Length; d++)
+        for (int d = 0; d < dialogoInicial.Length; d++)
         {
+            float delay = dialogoInicial[d].Length * 0.06f;
+
             if (d == dialogoInicial.Length - 1)
                 finalizar = true;
 
             uIController.MostrarDialogo(dialogoInicial[d],finalizar);
-            yield return new WaitForSeconds(dialogoInicial[d].Length+1);
+            yield return new WaitForSeconds(delay);
 
             if (finalizar)
             {
-                yield return new WaitForSeconds(dialogoInicial[d].Length + 1);
                 uIController.LimpiarInfoDialogo();
+                //Eventos.Pausar(true); Eventos.Comienzo(false);
                 uIController.indicaciones.gameObject.SetActive(true);
+
+
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
             }
         }
     }

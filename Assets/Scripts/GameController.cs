@@ -17,15 +17,14 @@ public class GameController : MonoBehaviour
         selector = FindObjectOfType<SelectorController>();
         skybox = Resources.Load<Material>("Materiales/FS002_Day_Sunless");
 
+        Pausa(false);
+
         Eventos.Pausar += Pausa;
         Eventos.FinalizarJuego += JuegoTerminado;
-
-        Pausar(true);
     }
-
-    public void Pausar(bool p)
+    public void ContinuarJuego()
     {
-        Eventos.Pausar(p);
+        Eventos.Pausar(false);
     }
     void JuegoTerminado()
     {
@@ -35,14 +34,14 @@ public class GameController : MonoBehaviour
     }
     void Pausa(bool pausar)
     {
-        if (camara) camara.enabled = !pausar;
-        if (jugador) jugador.enabled = !pausar;
-        if (selector) selector.enabled = !pausar;
-
+        //if (camara) camara.enabled = !pausar;
+        //if (jugador) jugador.enabled = !pausar;
+        //if (selector) selector.enabled = !pausar;
         if (pausar)
             Cursor.lockState = CursorLockMode.None;
         else
             Cursor.lockState = CursorLockMode.Locked;
+
         Cursor.visible = pausar;
     }
     public void Salir()

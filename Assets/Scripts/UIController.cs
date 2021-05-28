@@ -23,8 +23,9 @@ public class UIController : MonoBehaviour
     public GameObject cargar;
 
     public Toggle[] tg_efectos;
-    public Toggle[] tg_Controladores;
+    public TMP_Dropdown d_Controlador;
 
+    //bool comienzo;
     private GameController gameController;
 
     #region Info
@@ -103,31 +104,49 @@ public class UIController : MonoBehaviour
         LimpiarMision();
         LimpiarInfoAdvertencia();
         LimpiarPuntaje();
-        opciones.gameObject.SetActive(false);
-        opcion.SetActive(false);
-        indicaciones.gameObject.SetActive(false);
-        dialogo.gameObject.SetActive(true);
+
+        EstadoPanelesInicio();
 
         Eventos.Pausar += Pausar;
         Eventos.Cargar += Cargar;
+        //Eventos.Comienzo += Comienzo;
+    }
+    //void Comienzo(bool c)
+    //{
+    //    comienzo = true;
+    //}
+    void EstadoPanelesInicio()
+    {
+        DesactivarInterfaz();
+        dialogo.gameObject.SetActive(true);
+        diana.gameObject.SetActive(true);
+    }
+    void DesactivarInterfaz()
+    {
+        diana.gameObject.SetActive(false);
+        ver.gameObject.SetActive(false);
+        mision.gameObject.SetActive(false);
+        progreso.gameObject.SetActive(false);
+        opciones.gameObject.SetActive(false);
+        opcion.SetActive(false);
+        indicaciones.gameObject.SetActive(false);
+        //dialogo.gameObject.SetActive(false);
+        accion.gameObject.SetActive(false);
+        misionCompletada.gameObject.SetActive(false);
     }
     public void Pausar(bool pausar)
     {
-        if (!indicaciones.gameObject.activeSelf && !dialogo.gameObject.activeSelf)
+        if (!indicaciones.gameObject.activeSelf /*&& !comienzo/*|| !dialogo.gameObject.activeSelf*/)
         {
             if (pausar)
             {
-                if (opcion) opcion.SetActive(false);
-                if (ver) ver.gameObject.SetActive(false);
-                if (accion) accion.gameObject.SetActive(false);
-                if (mision) mision.gameObject.SetActive(false);
-                if (progreso) progreso.gameObject.SetActive(false);
-                if (misionCompletada) misionCompletada.gameObject.SetActive(false);
+                DesactivarInterfaz();
 
                 if (opciones) opciones.gameObject.SetActive(true);
             }
             else
             {
+                diana.gameObject.SetActive(true);
                 if (opcion) opcion.SetActive(true);
                 if (ver) ver.gameObject.SetActive(true);
                 if (mision) mision.gameObject.SetActive(true);
@@ -142,14 +161,24 @@ public class UIController : MonoBehaviour
         cargar.gameObject.SetActive(false);
         StartCoroutine(nameof(Carga));
     }
-    public void MostrarDialogo(string d,bool f)
+    /// <summary>
+    /// Escribir dialogo del Chef
+    /// </summary>
+    /// Texto-Dialogo
+    /// <param name="d"></param>
+    /// Verifica si es la ultima cadena de texto
+    /// <param name="f"></param>
+    public void MostrarDialogo(string d, bool f)
     {
+        StopCoroutine(nameof(EscribirDialogo));
         Dialogo = null;
-        dialogo.gameObject.SetActive(true);
 
-        StartCoroutine(EscribirDialogo("CHEF: " + d,f));
+        if(!dialogo.gameObject.activeSelf)
+            dialogo.gameObject.SetActive(true);
+
+        StartCoroutine(EscribirDialogo("CHEF: " + d, f));
     }
-    IEnumerator EscribirDialogo(string d,bool f)
+    IEnumerator EscribirDialogo(string d, bool f)
     {
         foreach (char t in d.ToCharArray())
         {
@@ -399,72 +428,63 @@ public class UIController : MonoBehaviour
         }
         Application.targetFrameRate = tf;
 
-        if (tf <= 80 && tf!=0)
+        if (tf <= 80 && tf != 0)
         {
             gameController.EstadoSkybox(false);
-        }else
-            gameController.EstadoSkybox(true);
-    }
-    public void ActivarEfectos(bool estado)
-    {
-        if (estado)
-            if (tg_efectos.Length > 0 && tg_Controladores.Length > 1)
-            {
-                tg_Controladores[1].isOn = false;
-
-                for (int i = 0; i < tg_efectos.Length; i++)
-                {
-                    tg_efectos[i].isOn = true;
-                }
-            }
-    }
-    public void DesactivarEfectos(bool estado)
-    {
-        if (estado)
-            if (tg_efectos.Length > 0 && tg_Controladores.Length > 0)
-            {
-                tg_Controladores[0].isOn = false;
-
-                for (int i = 0; i < tg_efectos.Length; i++)
-                {
-                    tg_efectos[i].isOn = false;
-                }
-            }
-    }
-    public void ComprobarEfectosActivos(bool estado)
-    {
-        if (tg_Controladores.Length > 1 & tg_efectos.Length > 0)
-        {
-            if (estado)
-                tg_Controladores[0].isOn = EstadoEfectos(estado);
-            else
-                tg_Controladores[1].isOn = EstadoEfectos(estado);
         }
         else
-            print("Falta toggle");
+            gameController.EstadoSkybox(true);
+    }
+    public void EstadoMejoraVisual(int option)
+    {
+        switch (option)
+        {
+            //Default
+            case 0:
+                for(int v = 0; v < tg_efectos.Length; v++)
+                {
+                    if (v == 0 || v == 2 || v == 5)
+                        tg_efectos[v].isOn = true;
+                    else
+                        tg_efectos[v].isOn = false;
+                }
+                break;
+                //Activar
+            case 1:
+                if (tg_efectos.Length > 0 && d_Controlador != null)
+                    foreach (Toggle tg in tg_efectos)
+                        tg.isOn = true;
+                break;
+                //Desactivar
+            case 2:
+                if (tg_efectos.Length > 0 && d_Controlador != null)
+                    foreach (Toggle tg in tg_efectos)
+                        tg.isOn = false;
+                break;
+                //Default
+            //default:
+            //    break;
+
+        }
+    }
+    public void ComprobarEstadoEfectos(bool estado)
+    {
+        bool e = EstadoEfectos(estado);
+
+        if (e && estado == true)
+            d_Controlador.value = 1;
+        else if (e && estado == false)
+            d_Controlador.value = 2;
+        else d_Controlador.value = 3;
+
     }
     bool EstadoEfectos(bool estado)
     {
-        if (estado)
+        foreach (Toggle tg in tg_efectos)
         {
-            tg_Controladores[1].isOn = false;
-
-            foreach (Toggle tg in tg_efectos)
-            {
-                if (!tg.isOn)
-                    return false;
-            }
-            return true;
+            if (tg.isOn!=estado)
+                return false;
         }
-        else
-        {
-            tg_Controladores[0].isOn = false;
-            foreach (Toggle tg in tg_efectos)
-            {
-                if (tg.isOn)
-                    return false;
-            }
-            return true;
-        }
+        return true;
     }
 }

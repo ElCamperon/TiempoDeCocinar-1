@@ -1,11 +1,24 @@
 ﻿using UnityEngine;
+using Interactuar;
 public class JugadorController : MonoBehaviour
 {
     private CharacterController controlador;
     Vector3 velocidad;
-    private void Start()
+
+    Transform BrazoJugador { get => transform.GetChild(0).GetChild(0).transform; }
+
+    private void Awake()
     {
         controlador = GetComponent<CharacterController>();
+
+        Eventos.Pausar += OcultarBrazo;
+    }
+    void OcultarBrazo(bool estado)
+    {
+        if (estado)
+            BrazoJugador.gameObject.SetActive(false);
+        else
+            BrazoJugador.gameObject.SetActive(true);
     }
     private void Update()
     {
@@ -19,3 +32,4 @@ public class JugadorController : MonoBehaviour
         controlador.Move(velocidad * Time.deltaTime);
     }
 }
+

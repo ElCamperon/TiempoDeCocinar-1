@@ -102,6 +102,7 @@ namespace Interactuar
         public static Action FinalizarJuego;
         public static Action<bool> Pausar;
         public static Action Cargar;
+        //public static Action<bool> Comienzo;
     }
     public class Objeto
     {
