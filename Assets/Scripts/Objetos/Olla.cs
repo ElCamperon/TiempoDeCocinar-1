@@ -27,6 +27,7 @@ public class Olla : MonoBehaviour
 
     private bool conTapa = true;
     public int NivelAgua { get => (int)(cantAgua * 100 / altLiquido); }
+    //public int NivelLeche { get => (int)(cantLeche * 100); set => NivelLeche = value; }
     public int NivelLeche { get => (int)((cantLeche * 100) / altLiquido); set => NivelLeche = value; }
     public int NumeroDePanes { get => n_pan; }
     public int NumeroDeHuevos { get => n_huevo; }
@@ -91,19 +92,24 @@ public class Olla : MonoBehaviour
     }
     public void Agregar(Tipo_Alimento alimento)
     {
+        Tipo_Mensaje mensaje = Tipo_Mensaje.Null;
+
         switch (alimento)
         {
             case Tipo_Alimento.Leche:
                 if (!liquido.gameObject.activeSelf)
                     liquido.gameObject.SetActive(true);
 
-                if(NivelLeche + NivelAgua < 100)
+                if(NivelLeche + NivelAgua <= 100)
                 {
+                    print(NivelAgua + " , " + NivelLeche);
                     StartCoroutine(nameof(AgregarLeche));
 
                     if (colorLeche.a < 0.6f) colorLeche.a += 0.2f;
                     ColorMatLeche = colorLeche;
                 }
+                //Eventos.Mensaje(Tipo_Mensaje.AgregarLeche);
+                mensaje = Tipo_Mensaje.AgregarLeche;
                 break;
 
             case Tipo_Alimento.CebollaPicada:
@@ -114,6 +120,8 @@ public class Olla : MonoBehaviour
 
                     ui.Completo(alimento);
                     if (NivelAgua > 0 || NivelLeche > 0) Eventos.TipoDeSonido(Tipo_Sonido.AgregarAOlla);
+
+                    mensaje = Tipo_Mensaje.AgregarCebolla;
                 }
                 break;
 
@@ -123,6 +131,8 @@ public class Olla : MonoBehaviour
 
                 ui.Completo(alimento);
                 if (NivelAgua > 0 || NivelLeche > 0) Eventos.TipoDeSonido(Tipo_Sonido.AgregarAOlla);
+
+                mensaje = Tipo_Mensaje.AgregarCilantro;
                 break;
 
             case Tipo_Alimento.Huevo:
@@ -133,10 +143,12 @@ public class Olla : MonoBehaviour
                 }
                 n_huevo++;
                 ui.Huevo = n_huevo.ToString();
+                mensaje = Tipo_Mensaje.AgregarHuevo;
                 break;
 
             case Tipo_Alimento.Salero:
                 StartCoroutine(nameof(AgregarSal));
+                mensaje = Tipo_Mensaje.AgregarSal;
                 break;
 
             case Tipo_Alimento.Pan:
@@ -149,17 +161,17 @@ public class Olla : MonoBehaviour
                 }
                 n_pan++;
                 ui.Pan = n_pan.ToString();
+                mensaje = Tipo_Mensaje.AgregarPan;
                 break;
         }
-
-        ComprobarMisionCompletada();
+        ComprobarMisionCompletada(mensaje);
     }
     public void Hirviendo(float tHervir)
     {
         Temperatura += tHervir;
         ui.Hervir = Temperatura/100f;
 
-        ComprobarMisionCompletada();
+        ComprobarMisionCompletada(Tipo_Mensaje.Null);
     }
     public void Llenar(float alt)
     {
@@ -218,12 +230,15 @@ public class Olla : MonoBehaviour
         {
             l += n;
             cantLeche += n;
-
             AlturaElementos(n);
+
+            //NivelLeche += 100;
 
             ui.Leche = NivelLeche.ToString();
             ui.NivelLeche = NivelLeche / 100f;
 
+            ////print(NivelLeche + " , " + NivelLeche / 100f);
+            
             if (NivelLeche + NivelAgua > 100)
             {
                 cantLeche = (NivelLeche - ((NivelLeche + NivelAgua) - 100)) * altLiquido / 100;
@@ -240,7 +255,7 @@ public class Olla : MonoBehaviour
         sal++;
         ui.Sal = sal.ToString();
     }
-    void ComprobarMisionCompletada()
+    void ComprobarMisionCompletada(Tipo_Mensaje mensaje)
     {
         switch (mision)
         {
@@ -248,6 +263,7 @@ public class Olla : MonoBehaviour
                 if (hervir > 0 && (NivelAgua > 0 || NivelLeche > 0))
                 {
                     Eventos.MisionCompletada(GetComponent<Olla>().GetInstanceID());
+                    mensaje = Tipo_Mensaje.Mision;
                     mision++;
                 }
                 break;
@@ -255,6 +271,7 @@ public class Olla : MonoBehaviour
                 if(cebolla.gameObject.activeSelf && cilantro.gameObject.activeSelf && sal>0)
                 {
                     Eventos.MisionCompletada(0);
+                    mensaje = Tipo_Mensaje.Mision;
                     mision++;
                 }
                 break;
@@ -262,9 +279,12 @@ public class Olla : MonoBehaviour
                 if (huevo[0].gameObject.activeSelf && n_pan>0)
                 {
                     Eventos.MisionCompletada(0);
+                    mensaje = Tipo_Mensaje.Mision;
                     mision++;
                 }
                 break;
         }
+        if (!mensaje.Equals(Tipo_Mensaje.Null))
+            Eventos.Mensaje(mensaje);
     }
 }

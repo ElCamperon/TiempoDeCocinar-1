@@ -8,10 +8,11 @@ public class RotacionDeCamara : MonoBehaviour
     public Transform jugador;
 
     bool enPausa = false;
-    private void Start()
+    private void Awake()
     {
         Eventos.FinalizarJuego += JuegoTerminado;
         Eventos.Pausar += Pausar;
+        Pausar(true);
     }
     void JuegoTerminado()
     {

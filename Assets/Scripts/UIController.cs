@@ -27,7 +27,7 @@ public class UIController : MonoBehaviour
 
     //bool comienzo;
     private GameController gameController;
-
+    private GameObject[] l_interfaz;//=new GameObject[];
     #region Info
 
     //Dialogo
@@ -98,63 +98,91 @@ public class UIController : MonoBehaviour
 
         completo = Resources.Load<Sprite>("UI/Iconos/Completo");
 
+        LimpiarInfoPaneles();
+        //Interfaz();
+        EstadoPanelesInicio();
+
+        Eventos.Pausar += Pausar;
+        Eventos.Cargar += Cargar;
+    }
+    /// <summary>
+    /// Retira la informacion existente de los paneles
+    /// </summary>
+    void LimpiarInfoPaneles()
+    {
         TipoAccion();
         LimpiarInfoVer();
         LimpiarInfoOlla();
         LimpiarMision();
         LimpiarInfoAdvertencia();
         LimpiarPuntaje();
-
-        EstadoPanelesInicio();
-
-        Eventos.Pausar += Pausar;
-        Eventos.Cargar += Cargar;
-        //Eventos.Comienzo += Comienzo;
     }
-    //void Comienzo(bool c)
-    //{
-    //    comienzo = true;
-    //}
+    void Interfaz()
+    {
+        l_interfaz = new GameObject[] { diana.gameObject,ver.gameObject,mision.gameObject,progreso.gameObject,opciones.gameObject,
+            opcion.gameObject,indicaciones.gameObject,accion.gameObject,misionCompletada.gameObject,calificacion.gameObject};
+    }
     void EstadoPanelesInicio()
     {
-        DesactivarInterfaz();
-        dialogo.gameObject.SetActive(true);
-        diana.gameObject.SetActive(true);
+        Interfaz();
+        
+        //GameObject[] l = new GameObject[] { dialogo.gameObject,diana.gameObject };
+        DesactivarInterfaz(null,indicaciones.gameObject);
+        Eventos.Pausar(true);
     }
-    void DesactivarInterfaz()
+    /// <summary>
+    /// Desactivar todos los paneles de la interfaz
+    /// </summary>
+    void DesactivarInterfaz(GameObject[] excepciones=null, GameObject excepcion=null)
     {
-        diana.gameObject.SetActive(false);
-        ver.gameObject.SetActive(false);
-        mision.gameObject.SetActive(false);
-        progreso.gameObject.SetActive(false);
-        opciones.gameObject.SetActive(false);
-        opcion.SetActive(false);
-        indicaciones.gameObject.SetActive(false);
-        //dialogo.gameObject.SetActive(false);
-        accion.gameObject.SetActive(false);
-        misionCompletada.gameObject.SetActive(false);
+        if (excepcion != null)
+        {
+            foreach (var interfaz in l_interfaz)
+            {
+                if (interfaz != excepcion)
+                    interfaz.SetActive(false);
+                else 
+                    interfaz.SetActive(true);
+            }
+        }
+        else
+
+        if (excepciones!=null)
+        foreach(var interfaz in l_interfaz)
+        {
+            if (excepciones != null || excepciones.Length > 0)
+                for (int i = 0; i < excepciones.Length; i++)
+                {
+                    if (interfaz == excepciones[i])
+                        interfaz.gameObject.SetActive(true);
+                    else
+                        interfaz.gameObject.SetActive(false);
+                }
+            else
+                interfaz.SetActive(false);
+        }
     }
     public void Pausar(bool pausar)
     {
-        if (!indicaciones.gameObject.activeSelf /*&& !comienzo/*|| !dialogo.gameObject.activeSelf*/)
+        if (!indicaciones.gameObject.activeSelf)
         {
+            //print("Pausar: " + pausar);
             if (pausar)
             {
-                DesactivarInterfaz();
-
-                if (opciones) opciones.gameObject.SetActive(true);
+                //GameObject[] l = new GameObject[] { opciones.gameObject };
+                DesactivarInterfaz(null,opciones.gameObject);
             }
             else
             {
                 diana.gameObject.SetActive(true);
-                if (opcion) opcion.SetActive(true);
-                if (ver) ver.gameObject.SetActive(true);
-                if (mision) mision.gameObject.SetActive(true);
-                if (progreso) progreso.gameObject.SetActive(true);
-
-                if (opciones) opciones.gameObject.SetActive(false);
+                opcion.SetActive(true);
+                ver.gameObject.SetActive(true);
+                mision.gameObject.SetActive(true);
+                progreso.gameObject.SetActive(true);
+                opciones.gameObject.SetActive(false);
             }
         }
+        //else print("c");
     }
     private void Cargar()
     {
@@ -178,17 +206,20 @@ public class UIController : MonoBehaviour
 
         StartCoroutine(EscribirDialogo("CHEF: " + d, f));
     }
-    IEnumerator EscribirDialogo(string d, bool f)
+    IEnumerator EscribirDialogo(string _dialogo, bool finalizar)
     {
-        foreach (char t in d.ToCharArray())
+        int numeroLetra = 0;
+        foreach (char letra in _dialogo.ToCharArray())
         {
-            Dialogo += t;
+            Dialogo += letra;
+            numeroLetra++;
             yield return null;
-        }
-        if (f)
-        {
-            yield return new WaitForSeconds(d.Length);
-            LimpiarInfoDialogo();
+
+            if (finalizar && numeroLetra >= _dialogo.ToCharArray().Length)
+                Invoke(nameof(LimpiarInfoDialogo), _dialogo.Length * 0.05f);
+            //else 
+            //if (!dialogo.gameObject.activeSelf)
+            //    dialogo.gameObject.SetActive(true);
         }
     }
     public void MostrarAdvertencia(string a)
@@ -207,6 +238,13 @@ public class UIController : MonoBehaviour
         }
         yield return new WaitForSeconds(4.5f);
         LimpiarInfoAdvertencia();
+    }
+    public void MostrarIndicaciones()
+    {
+        //GameObject[] l = new GameObject[] { indicaciones.gameObject };
+        DesactivarInterfaz(null, indicaciones.gameObject);
+
+        //indicaciones.gameObject.SetActive(true);
     }
     public void CambiarMision(int pos, string mis, string paso)
     {
@@ -329,18 +367,13 @@ public class UIController : MonoBehaviour
     }
     public void CompletarPartida(Olla olla)
     {
+        ChefController chef;
+        if (GetComponent<ChefController>())
+            chef = GetComponent<ChefController>();
+        else chef = FindObjectOfType<ChefController>();
+
         int[] resultado = Objeto.EvaluarResultado(olla);
-
-        diana.gameObject.SetActive(false);
-        advertencia.gameObject.SetActive(false);
-        ver.gameObject.SetActive(false);
-        accion.gameObject.SetActive(false);
-        mision.gameObject.SetActive(false);
-        progreso.gameObject.SetActive(false);
-        misionCompletada.gameObject.SetActive(false);
-        tv.gameObject.SetActive(false);
-        opciones.gameObject.SetActive(false);
-
+    
         PuntajeAgua = resultado[0].ToString();
         PuntajeLeche = resultado[1].ToString();
         PuntajeCilantro = resultado[2].ToString();
@@ -349,8 +382,9 @@ public class UIController : MonoBehaviour
         PuntajeHuevo = resultado[5].ToString();
         Puntaje = resultado[6].ToString();
 
-        calificacion.gameObject.SetActive(true);
+        chef.MostrarDialogoFinal(resultado);
 
+        DesactivarInterfaz(null,calificacion.gameObject);
     }
     void LimpiarMision()
     {
@@ -384,10 +418,8 @@ public class UIController : MonoBehaviour
     public void RetirarIndicaciones()
     {
         indicaciones.gameObject.SetActive(false);
-        opcion.SetActive(true);
+        //opcion.SetActive(true);
         Eventos.Pausar(false);
-        //Cursor.lockState = CursorLockMode.Locked;
-        //Cursor.visible = false;
     }
     IEnumerator Carga()
     {

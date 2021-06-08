@@ -17,7 +17,7 @@ public class GameController : MonoBehaviour
         selector = FindObjectOfType<SelectorController>();
         skybox = Resources.Load<Material>("Materiales/FS002_Day_Sunless");
 
-        Pausa(false);
+        Pausa(true);
 
         Eventos.Pausar += Pausa;
         Eventos.FinalizarJuego += JuegoTerminado;
@@ -38,9 +38,15 @@ public class GameController : MonoBehaviour
         //if (jugador) jugador.enabled = !pausar;
         //if (selector) selector.enabled = !pausar;
         if (pausar)
+        {
             Cursor.lockState = CursorLockMode.None;
+            jugador.enabled = false;
+        }
         else
+        {
             Cursor.lockState = CursorLockMode.Locked;
+            jugador.enabled = true;
+        }
 
         Cursor.visible = pausar;
     }

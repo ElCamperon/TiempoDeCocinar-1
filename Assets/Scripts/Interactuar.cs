@@ -77,6 +77,13 @@ namespace Interactuar
         Tapa,
         Picar,
         Incompleto,
+        AgregarLeche,
+        AgregarCebolla,
+        AgregarCilantro,
+        AgregarHuevo,
+        AgregarSal,
+        AgregarPan,
+        Mision
     }
     /// <summary>
     /// Tipo de sonido a escucharse de manera global
@@ -102,7 +109,6 @@ namespace Interactuar
         public static Action FinalizarJuego;
         public static Action<bool> Pausar;
         public static Action Cargar;
-        //public static Action<bool> Comienzo;
     }
     public class Objeto
     {
@@ -305,14 +311,14 @@ namespace Interactuar
         void ObjetosHabilitados(Transform padre, bool habilitar)
         {
             if (padre.childCount > 0)
-                for (int n = 0; n < padre.childCount; n++)
+            for (int n = 0; n < padre.childCount; n++)
+            {
+                //padre.GetChild(n).gameObject.SetActive(habilitar);
+                if (padre.GetChild(n) != padre && !padre.GetChild(n).GetComponent<Olla>())
                 {
-                    //padre.GetChild(n).gameObject.SetActive(habilitar);
-                    if (padre.GetChild(n) != padre && !padre.GetChild(n).GetComponent<Olla>())
-                    {
-                        padre.GetChild(n).gameObject.SetActive(habilitar);
-                    }
+                    padre.GetChild(n).gameObject.SetActive(habilitar);
                 }
+            }
         }
     }
 }
